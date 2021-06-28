@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -13,6 +15,15 @@ func main() {
 	fmt.Println("check file: " + file)
 	min := -2147483648
 	max := 2147483647
+
+	go func() {
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
+		s := <-sig
+		fmt.Printf("Received signal: %s", s)
+		os.Exit(0)
+	}()
+
 	count := 0
 	for {
 		for i := min; i < max; i++ {
